@@ -15,6 +15,71 @@ class App
     public static $error;
 
     /**
+     * @param string|null $method
+     * @param string $pattern
+     * @param \Closure $callback
+     * @return void
+     */
+    public static function route($method = null, $pattern, \Closure $callback)
+    {
+        $route = [
+            'method' => is_string($method) ? strtoupper($method) : null,
+            'pattern' => $pattern,
+            'callback' => $callback
+        ];
+        array_unshift(static::$routes, $route);
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function run()
+    {
+        // process request method and URL (to "path")
+        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+        $path = trim(preg_replace(
+            sprintf('/^%s/', preg_quote(dirname($_SERVER['SCRIPT_NAME']), '/')),
+            '',
+            preg_replace('/\?.*$/', '', urldecode($_SERVER['REQUEST_URI']))
+        ), '/');
+
+        // traverse routes
+        $callback = null;
+        $params = null;
+        foreach (static::$routes as $i => $route) {
+            if (@preg_match($route['pattern'], $path, $matches) === 1) {
+                if (is_null($route['method']) || $route['method'] === $method) {
+                    // method and pattern both matched
+                    $callback = $route['callback'];
+                    $params = array_slice($matches, 1);
+                    break;
+                } else {
+                    // pattern matched, but method did not
+                }
+            } else {
+                // pattern did not match
+            }
+        }
+
+        // call the callback
+        try {
+            if (is_callable($callback)) {
+                return call_user_func_array($callback, $params);
+            } else {
+                throw new \RuntimeException('Not Found', 404);
+            }
+        } catch (\Exception $e) {
+            if (is_callable(static::$error)) {
+                return call_user_func(static::$error, $e);
+            } else {
+                http_response_code($e->getCode());
+                // TODO: need a fancier display
+                die(sprintf('%s: %s', $e->getCode(), $e->getMessage()));
+            }
+        }
+    }
+
+    /**
      * @param $url
      * @param int|null $code
      */

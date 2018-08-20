@@ -1,0 +1,21 @@
+{
+  "name": "mitsumotocs/ppp",
+  "description": "PPP - Primitive PHP Project",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Joji Mitsumoto",
+      "email": "mitsumotocs@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "PPP\\": "src"
+    }
+  }
+}

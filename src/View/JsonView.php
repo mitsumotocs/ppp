@@ -1,7 +1,7 @@
 <?php
 namespace PPP\View;
 
-class JsonView extends View
+class JsonView extends View implements ViewInterface
 {
     const HTTP_CONTENT_TYPE = 'application/json';
 

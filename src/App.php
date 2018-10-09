@@ -15,6 +15,15 @@ class App
     public static $error;
 
     /**
+     * @param Config $config
+     * @return void
+     */
+    public static function configure(Config $config)
+    {
+        static::$config = $config;
+    }
+
+    /**
      * @param string|null $method
      * @param string $pattern
      * @param \Closure $callback
@@ -31,10 +40,19 @@ class App
     }
 
     /**
+     * @param Config|null $config
      * @return mixed
      */
-    public static function run()
+    public static function run(Config $config = null)
     {
+        // prepare config
+        if (isset($config)) {
+            static::configure($config);
+        }
+        if (!(static::$config instanceof Config)) {
+            static::$config = new Config;
+        }
+
         // process request method and URL (to "path")
         $method = strtoupper($_SERVER['REQUEST_METHOD']);
         $path = trim(preg_replace(

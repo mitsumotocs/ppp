@@ -9,7 +9,7 @@ class Config
      */
     public function __get($name)
     {
-        if (isset($this->$name)) {
+        if (property_exists($this, $name)) {
             return $this->$name;
         } else {
             throw new \LogicException(sprintf('Value named "%s" is not defined.', $name));
